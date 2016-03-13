@@ -1,0 +1,112 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |10.29|) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+;; A NSet is a [List-of Number]
+;; where repeats are allowed, order does not matter
+
+(define A (list 1 2 3))
+(define B (list 2 3 4))
+(define C (list 1 2 3 4 5))
+(define D (list 2 3 4))
+
+;; contains? : Number NSet -> Boolean
+;; is the given number in the set?
+(define (contains? n aset)
+  ;;[Number -> Boolean] [Listof Number] -> Boolean
+  (ormap (λ (x) (= x n)) aset))
+
+(check-expect (contains? 1 A) true)
+(check-expect (contains? 5 A) false)
+(check-expect (contains? 3 A) true)
+
+;; subset? : NSet NSet -> Boolean
+;; is the first set a subst of the second set?
+(define (subset? a b)
+  ;;[Number -> Boolean] [Listof Number] -> Boolean
+  (andmap (lambda (x) (contains? x b)) a))
+(check-expect (subset? A B) false)
+(check-expect (subset? A C) true)
+
+;; set-equal? : NSet NSet -> Boolean
+;; are the two sets equal?
+(define (set-equal? a b)
+  (and (subset? a b)
+       (subset? b a)))
+
+(check-expect (set-equal? A B) false)
+(check-expect (set-equal? B D) true)
+(check-expect (set-equal? A '(1 2 3 1 2 3 3 3)) true)
+
+;; intersect : NSet NSet -> NSet
+;; produce the set of numbers that are contained in both sets
+(define (intersect a b)
+  ;;[Number -> Boolean] [List-of Number] -> [List-of Number]
+  (filter (lambda (n) (contains? n b)) a))
+
+(check-expect (intersect A B) '(2 3))
+(check-expect (intersect A '(5 6 7)) '())
+(check-expect (intersect A '()) '())
+(check-expect (intersect '() A) '())
+
+;; union : NSet NSet -> NSet
+;; compute the union of set a and set b
+(define (union a b)
+  (append a (filter (lambda (x) (not (contains? x a))) b)))
+
+(check-expect (union A B) '(1 2 3 4))
+(check-expect (union A '()) A)
+(check-expect (union '() A) A)
+(check-expect (union '(1 2 2) '(2 3 4)) '(1 2 2 3 4))
+
+;; [Set X] = [X -> Boolean]
+;; represent a set using a characteristic function
+(define evens (lambda (x) (and (even? x) (integer? x))))
+
+(define num-0-10 (lambda (x) (and (integer? x) (>= x 0) (<= x 10))))
+
+;; contains?.v2 : X [Set X] -> Boolean
+;; is the element contained in the set that is represented 
+;; using a characteristic function
+(define (contains?.v2 x aset)
+  (aset x))
+
+(check-expect (contains?.v2 3 evens) false)
+(check-expect (contains?.v2 6 num-0-10) true)
+
+
+
+
+
+
+
+
+
+;; cartesian : [Set X] [Set X] -> [Set Posn]
+;; create all possible posn of elements from set 1 and set 2
+;; assume that sets are smae length
+(define (cross-product a b)
+  (foldr (lambda (x aset)
+           (append (map (lambda (y) (make-posn x y)) b) aset)) empty a))
+  
+(check-expect (cross-product A B)
+              (list (make-posn 1 2)
+                    (make-posn 2 3)
+                    (make-posn 3 4)
+                    (make-posn 2 2)
+                    (make-posn 2 4)
+                    (make-posn 1 3)
+                    (make-posn 1 4)
+                    (make-posn 3 2)
+                    (make-posn 3 3)))
+
+;; cross-one : X [Set X] -> [Set Posn]
+;; cross the members of the set with the given element
+(define (cross-one x aset)
+  (cond [(empty? aset) empty]
+        [else (cons (make-posn x (first aset))
+                    (cross-one x (rest aset)))]))
+
+(check-expect (cross-one 1 '(1 2 3))
+              (list (make-posn 1 1)
+                    (make-posn 1 2)
+                    (make-posn 1 3)))

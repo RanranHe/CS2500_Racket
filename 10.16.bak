@@ -1,0 +1,72 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname |10.16|) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+(require 2htdp/image)
+;; A LON is one of :
+;; empty
+;; (cons Number LON
+
+;; Number LON -> LON
+;; add the numbers in the list together
+#|
+(define (add-up alon)
+  (cond [(empty? alon) 0]
+        [(cons? alon) (+ (first alon)
+                         (add-up (rest alon)))]))
+|#
+(define (add-up alon)
+  (process + 0 alon))
+
+(check-expect (add-up '(1 2 3 4)) 10)
+(check-expect (add-up empty) 0)
+
+;; mult: LON -》 NUmber
+;; multiply the numbers in the list together
+#|
+(define (mult alon)
+  (cond [(empty? alon) 1]
+        [(cons? alon) (* (first alon)
+                         (mult (rest alon)))]))
+|#
+(define (mult alon)
+  (process * 1 alon))
+
+(check-expect (mult '(1 2 3 4)) 24)
+(check-expect (mult empty) 1)
+
+;; process: OP Number LON -> Number
+;; process the members of the list using the given operator
+(define (process op base alon)
+  (cond [(empty? alon) base]
+        [(cons? alon) (op (first alon)
+                          (process op base (rest alon)))]))
+
+(check-expect (process + 0 '(1 2 3 4)) 10)
+
+#;(define (add-up alon)
+    (cond [(empty? alon) ...]
+          [(cons? alon) ...(first alon)
+                        ...(add-up (rest alon))]))
+
+;; A LOI is one of 
+;; empty
+;; (Cons Image LOI)
+
+(define loi1 (list (circle 50 'solid 'red)
+                   (circle 100 'solid 'blue)))
+
+;; overlay-loi: LOI -> Image
+;; overlay the images in the list
+(define (overlay-loi alon)
+  (cond [(empty? alon) (empty-scene 300 300)]
+        [(cons? alon) (overlay (first alon)
+                               (overlay-loi (rest alon)))]))
+
+(check-expect (overlay-loi loi1)
+              (overlay (circle 50 'solid 'red)
+                       (circle 100 'solid 'blue)
+                       (empty-scene 300 300)))
+                   
+
+
+

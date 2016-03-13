@@ -1,0 +1,29 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname |2014spring-exmam3 example|) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+;;==============================2014spring-exmam3 example==================================;;
+
+;;================Problem 1================;;
+;; We can make binary trees with strings for leaves, or binary trees with numbers for 
+;; leaves, or binary trees with anything we’d like for the leaves, using the following data definition.
+
+(define-struct node (left right))
+;; A [BT X] is one of:
+;; - an X
+;; - (make-node [BT X] [BT X])
+
+;; For example, we can make a binary tree of strings (i.e., a [BT String]) with
+(define bt1 (make-node (make-node "Olin" "Shivers")
+                       (make-node "David"
+                                  (make-node "Van" "Horn"))))
+
+;; Recall that the foldr operation allows us to process the elements of a list: add them up, 
+;; multiply them together, assemble them into a set, etc. Similarly, we can define an analogous 
+;; “loop function” to fold up a binary tree, called fold-tree.
+;; Applying fold-tree with these arguments
+;; (fold-tree + string-length bt1)
+;; will replace every occurrence of make-node in bt1 with +, and every leaf s with
+;; (string-length s), computing
+;; (+ (+ (string-length "Olin") (string-length "Shivers"))
+;; (+ (string-length "David")
+;; (+ (string-length "Van") (string-length "Horn"))))
